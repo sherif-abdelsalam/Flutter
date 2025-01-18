@@ -53,7 +53,7 @@ class _AddExpenseState extends State<AddExpense> {
     if (isInvalidDate || isInValidAmount || isInValidTitle) {
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
+        builder: (ctx) => AlertDialog.adaptive(
           title: Text("Invalid input"),
           content: Text(
               "Please make sure all input fields are filled with valid data"),

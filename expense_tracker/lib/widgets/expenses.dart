@@ -1,6 +1,6 @@
 import 'package:expense_tracker/data/expenses_list_dummy_data.dart';
-import 'package:expense_tracker/main.dart';
 import 'package:expense_tracker/models/expense.dart';
+import 'package:expense_tracker/widgets/chart/char.dart';
 import 'package:expense_tracker/widgets/expenses_list/add_expense/add_expense.dart';
 import 'package:expense_tracker/widgets/expenses_list/expenses_list.dart';
 import 'package:flutter/material.dart';
@@ -27,11 +27,26 @@ class _ExpensesState extends State<Expenses> {
       registeredExpenses.add(newExpense);
     });
   }
-
   void _removeExpense(Expense expense) {
+    final expenseIndex = registeredExpenses.indexOf(expense);
     setState(() {
       registeredExpenses.remove(expense);
     });
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: Duration(seconds: 3),
+        content: Text("Expense deleted"),
+        action: SnackBarAction(
+          label: "Undo",
+          onPressed: () {
+            setState(() {
+              registeredExpenses.insert(expenseIndex, expense);
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override
@@ -60,7 +75,7 @@ class _ExpensesState extends State<Expenses> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Center(child: Text("The chart")),
+            Chart(expenses: registeredExpenses),
             Expanded(
               child: mainContent,
             ),
