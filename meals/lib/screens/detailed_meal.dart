@@ -1,24 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:meals/models/meal.dart';
+import 'package:meals/providers/favorites_provider.dart';
 
-class MealDetailsScreen extends StatelessWidget {
-  const MealDetailsScreen(
-      {super.key, required this.meal, required this.onSelectFavoriteMeal});
-  final void Function(Meal meal) onSelectFavoriteMeal;
+class MealDetailsScreen extends ConsumerWidget {
+  const MealDetailsScreen({
+    super.key,
+    required this.meal,
+  });
   final Meal meal;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    void showSnackBar(bool isAdded) {
+      var message = "Meal is no longer exist in favorites ☹";
+      if (isAdded) message = "Meal added to favorites 😋";
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          duration: Duration(seconds: 2),
+          content: Center(
+            child: Text(
+              message,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    final favoritesMeals = ref.watch(favoritesMealsProvider);
+    final isFavorite = favoritesMeals.contains(meal);
     return Scaffold(
         appBar: AppBar(
           title: Text(meal.title),
           actions: [
             IconButton(
               onPressed: () {
-                onSelectFavoriteMeal(meal);
+                final isAdded = ref
+                    .read(favoritesMealsProvider.notifier)
+                    .toggleMealNotifier(meal);
+                showSnackBar(isAdded);
               },
-              icon: Icon(Icons.star_border),
+              icon: !isFavorite ? Icon(Icons.star_border) : Icon(Icons.star),
             ),
           ],
         ),
